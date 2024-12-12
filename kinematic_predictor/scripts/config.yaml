@@ -1,0 +1,38 @@
+seed: 42
+ckpt_period: 10
+
+version_no: Nadia_v17
+datapath: kinematic_predictor/data
+ckptpath: kinematic_predictor/ckpt
+imgpath: kinematic_predictor/img
+
+fps: 60
+window: 2.0
+n_joints: 23
+intermediate_channels: 40
+phase_channels: 8
+validation_ratio: 0.15
+
+PAE:
+  n_epochs: 150
+  batch_size: 32
+  learning_rate: 0.0005
+  weight_decay: 0.0005
+  restart_period: 10
+  t_mult: 2
+  full_joint_state: False
+  patience: 10
+  min_delta: 0.001
+
+MANN:
+  sampled_frames: 13
+  n_epochs: 150
+  batch_size: 32
+  gating_hidden: 128
+  main_hidden: 1024
+  n_experts: 8
+  dropout: 0.3
+  learning_rate: 0.0004
+  weight_decay: 0.0004
+  restart_period: 10
+  t_mult: 2
