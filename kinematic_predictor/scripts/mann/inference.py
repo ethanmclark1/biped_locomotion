@@ -2,7 +2,6 @@ import os
 import yaml
 import torch
 import numpy as np
-import torch.nn.functional as F
 import matplotlib.pyplot as plt
 
 import kinematic_predictor.scripts.utils.helper as helper
@@ -24,7 +23,7 @@ class DeepPhase:
         device: str,
     ) -> None:
 
-        self.fps = fps
+        self.dt = 1 / fps
         self.phase_channels = phase_channels
         self.total_frames = total_frames
         self.sampled_frames = sampled_frames
@@ -110,7 +109,7 @@ class DeepPhase:
             signed_angle = signed_angle / 360 % 1
 
         return signed_angle
-    
+
     def increment_phase_series(self) -> None:
         current_total_frame = self.total_frames // 2
 
@@ -125,13 +124,17 @@ class DeepPhase:
         ].clone()
 
     def get_phase_space(self) -> torch.Tensor:
-        adjusted_phase_space = torch.zeros((self.sampled_frames, self.phase_channels, 2))
+        adjusted_phase_space = torch.zeros(
+            (self.sampled_frames, self.phase_channels, 2)
+        )
         for i in range(self.sampled_frames):
             total_index = i * 10
             for j in range(self.phase_channels):
                 phase_vec = self._get_phase_vector(self._phase_angle[total_index, j])
                 # multiply by amplitude to zero out frames that have not been experienced hence why amplitude is 0
-                adjusted_phase_space[i, j] = self._amplitudes[total_index, j] * phase_vec
+                adjusted_phase_space[i, j] = (
+                    self._amplitudes[total_index, j] * phase_vec
+                )
 
         phase_space = adjusted_phase_space.reshape(1, -1)
 
@@ -162,7 +165,7 @@ class DeepPhase:
                 pivot += 4
 
                 # authors multiply by 360 instead of 2*np.pi because Quaternion.AngleAxis expects angle in degrees
-                theta = -predicted_freq * 2 * np.pi * 1 / 60
+                theta = -predicted_freq * 2 * np.pi * self.dt
                 cos_theta = torch.cos(theta)
                 sin_theta = torch.sin(theta)
 
@@ -469,11 +472,12 @@ if __name__ == "__main__":
     joint_positions = input[:, INPUT_STRUCTURE["joint_positions"]]
     joint_velocities = input[:, INPUT_STRUCTURE["joint_velocities"]]
     foot_contacts = input[:, INPUT_STRUCTURE["foot_contacts"]]
-    
+
     for i, (_, target) in enumerate(dataloader):
         if i == window_size:
             break
-        
+
+        # TODO: Optimize efficiency of this as it uses nested for loops
         phase_space = deep_phase.get_phase_space()
 
         input = torch.cat(
@@ -490,7 +494,7 @@ if __name__ == "__main__":
             ),
             axis=1,
         )
-        
+
         with torch.no_grad():
             y_pred = mann(input)
 
@@ -510,7 +514,8 @@ if __name__ == "__main__":
         ground_truth_phase_space = ground_truth_next_input[
             :, INPUT_STRUCTURE["phase_space"]
         ]
-        
+
+        # TODO: Optimize efficiency of these as they all use nested for loops
         deep_phase.increment_phase_series()
         updated_phase_series = deep_phase.combine_phases(phase_update)
         deep_phase.interpolate_phase_series(updated_phase_series)

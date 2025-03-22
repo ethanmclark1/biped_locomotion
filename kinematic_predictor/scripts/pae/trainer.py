@@ -578,7 +578,7 @@ if __name__ == "__main__":
     if load_model:
         parameters = trainer.load()
     else:
-        print("Model not found. Training PAE from scratch.")
+        print("Model not loaded. Training PAE from scratch.")
         trainer.init_wandb()
         trainer.train(window_size)
         parameters = trainer.save_model()

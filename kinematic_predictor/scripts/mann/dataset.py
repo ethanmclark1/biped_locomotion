@@ -178,7 +178,7 @@ class DatasetMANN(Dataset):
         inverse_root_rotation = root_rotations.inv()
         robot_projected_gravity = torch.from_numpy(inverse_root_rotation.apply(GRAVITY))
 
-        z_angle = R.from_quat(root_quaternion).as_euler("zyx")[:, 0]
+        z_angle = root_rotations.as_euler("zyx")[:, 0]
         x_vel = root_states[:, 7]
         y_vel = root_states[:, 8]
         forward_vel = x_vel * np.cos(-z_angle) + y_vel * np.sin(-z_angle)
@@ -238,7 +238,7 @@ class DatasetMANN(Dataset):
             # transpose to match shape of phase_space (n_samples, n_channels, sampled_frames, 2)
             phase_space[k, ..., 0] = (window_amp * np.sin(2 * np.pi * window_shift)).T
             phase_space[k, ..., 1] = (window_amp * np.cos(2 * np.pi * window_shift)).T
-        
+
         # reshape to (n_samples, sampled_frames, n_channels, 2)
         phase_space = phase_space.swapaxes(1, 2)
         return phase_space.reshape(n_samples, -1)
@@ -279,7 +279,7 @@ class DatasetMANN(Dataset):
             phase_update[k, ..., 1] = (window_amp * np.cos(2 * np.pi * window_shift)).T
             phase_update[k, ..., 2] = window_amp.T
             phase_update[k, ..., 3] = window_freqs.T
-            
+
         # reshape to (n_samples, sampled_frames // 2, n_channels, 2)
         phase_update = phase_update.swapaxes(1, 2)
         return phase_update.reshape(n_samples, -1)
@@ -295,6 +295,7 @@ class DatasetMANN(Dataset):
         ckptpath: str,
         version_no: str,
         full_joint_state: bool,
+        mirroring: bool,
     ) -> None:
 
         for sequence_num, data_path in enumerate(data_paths):
