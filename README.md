@@ -1,10 +1,10 @@
-# Kinematic Predictor: A Robot-Agnostic Framework for Motion Generation
+# Humanoid Locomotion: Deep Phase Motion Generation Framework
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache2.0-yellow.svg)](https://opensource.org/licenses/MIT) ![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg) ![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache2.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0) ![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg) ![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Overview
 
-Kinematic Predictor is a robot-agnostic framework that adapts the [DeepPhase](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2022) motion generation system ([Starke et al., 2022](https://github.com/sebastianstarke/AI4Animation/blob/master/Media/SIGGRAPH_2022/Paper.pdf)) for practical robotics applications. This implementation transforms the original animation-focused approach into a flexible framework for generating fluid, natural motions for various robot platforms.
+Humanoid Locomotion is a robot-agnostic framework that adapts the [DeepPhase](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2022) motion generation system ([Starke et al., 2022](https://github.com/sebastianstarke/AI4Animation/blob/master/Media/SIGGRAPH_2022/Paper.pdf)) for practical robotics applications. This implementation transforms the original animation-focused approach into a flexible framework for generating fluid, natural motions for various robot platforms.
 
 Key contributions of this repo include:
 
@@ -15,72 +15,153 @@ Key contributions of this repo include:
 
 ## Technical Architecture
 
-### Input Processing (PAE)
+The framework consists of two main components:
 
-Input Format:
+### 1. Periodic Autoencoder (PAE)
 
-* Motion capture sequence identifier
-* Joint velocities (transformed into the root space with a window-based mean subtracted from it)
+The PAE learns to encode motion data into a compact, periodic representation:
 
-### Output Processing (MANN)
+* **Input** : Joint states (positions and velocities) with window-based normalization
+* **Output** : Periodic phase parameters (shift, frequency, amplitude)
 
-Input Features:
+### 2. Mode-Adaptive Neural Network (MANN)
 
-* Command velocities (xy linear, yaw)
-* Projected gravity vector
-* Joint positions and velocities
-* Phase space representation
+The MANN uses the phase representation to predict motion:
 
-Output Features:
+* **Input** : Command velocities, robot state, and phase space representation
+* **Output** : Next robot state, joint positions/velocities, contact states, and phase updates
 
-* Root state updates (position and velocity)
-* Joint positions and velocities
-* Contact states
-* Phase vector updates
+## Installation
 
-For detailed insights into the underlying architecture and theoretical foundations, please refer to the original [DeepPhase paper](https://github.com/sebastianstarke/AI4Animation/blob/master/Media/SIGGRAPH_2022/Paper.pdf).
+### Prerequisites
 
-## Setup
+* Python 3.9
+* CUDA-compatible GPU (recommended)
+* Git LFS (for managing large data files)
 
-### Requirements
+### Clone the Repository
 
-1. Create the conda environment
+```bash
+# Install Git LFS first if you haven't
+apt-get install git-lfs  # Ubuntu/Debian
+# OR
+brew install git-lfs  # macOS
 
-   ```
-   conda env create -f environment.yml
-   ```
-2. Activate the environment
+# Clone and initialize LFS
+git clone https://github.com/ethanmclark1/humanoid_loco.git
+cd humanoid_loco
+git lfs install
+git lfs pull
+```
 
-   ```
-   conda activate kinematic_predictor
-   ```
-3. Verify the installation
+### Environment Setup
 
-   ```
-   python -c "import torch; import numpy as np; import pandas as pd; import quaternion; import scipy"
-   ```
+```bash
+# Create and activate conda environment
+conda env create -f environment.yml
+conda activate humanoid_loco
 
-### Optional Setup
+# Verify installation
+python -c "import torch; import numpy as np; import quaternion; import scipy"
+```
 
-1. Set up pre-commit hooks for development
-   ```
-   pre-commit install
-   ```
-2. Configure Weights & Biases for experiment tracking
-   ```
-   wandb login
-   ```
+### Directory Structure
 
-## Robot Configuration
+The repository is organized as follows:
 
-The framework is designed to work particularly with bipedal robots but can be adapted to quadrupeds as well. To configure for your platform:
+```
+humanoid_loco/
+├── data/                # Motion capture data (LFS tracked)
+├── scripts/             # Core implementation
+│   ├── mann/            # Mode-Adaptive Neural Network
+│   ├── pae/             # Periodic Autoencoder
+│   ├── test/            # Test utilities
+│   └── utils/           # Helper functions
+├── ckpt/                # Model checkpoints (created during training)
+└── img/                 # Output visualizations (created during training)
+```
 
-1. Prepare your robot's state data:
-   * Root state information (position, orientation, velocities)
-   * Joint states (positions, velocities)
-   * Contact information
-2. Format your data according to the input/output specifications detailed in the documentation
-3. Configure the network parameters based on your robot's degrees of freedom
+## Usage
+
+> **Important** : All scripts should be run from the project root directory to avoid import errors!
+
+### Data Preparation
+
+Place your motion data in the `humanoid_loco/data/sequence_X/` directories with:
+
+* `walking_joint_states.npy`: Joint angles in degrees
+* `walking_root_states.npy`: Root position, orientation and velocities
+* `walking_foot_contacts.npy`: Contact states
+
+### Training Pipeline
+
+#### 1. Train the Periodic Autoencoder (PAE)
+
+```bash
+# Run from project root
+python -m humanoid_loco.scripts.pae.trainer
+```
+
+This learns to encode joint motions into periodic phase parameters.
+
+#### 2. Train the Mode-Adaptive Neural Network (MANN)
+
+```bash
+# Run from project root 
+python -m humanoid_loco.scripts.mann.trainer
+```
+
+This learns to predict motion based on command inputs and phase representation.
+
+### Inference
+
+To run inference and generate motion:
+
+```bash
+python -m humanoid_loco.scripts.mann.inference
+```
+
+### Configuration
+
+Modify `humanoid_loco/scripts/config.yaml` to adjust:
+
+* Network architecture parameters
+* Training hyperparameters
+* Data processing settings
+
+## Troubleshooting
+
+### Import Errors
+
+If you encounter `ModuleNotFoundError: No module named 'humanoid_loco'`, ensure you're running scripts from the project root:
+
+```bash
+# Correct way to run scripts
+cd /path/to/humanoid_loco
+python -m humanoid_loco.scripts.pae.trainer
+```
+
+### CUDA Issues
+
+If you encounter CUDA errors, verify your PyTorch installation matches your CUDA version:
+
+```bash
+python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}, Version: {torch.version.cuda}')"
+```
+
+## Model Configuration
+
+### PAE Configuration
+
+* `phase_channels`: Number of phase channels (default: 8)
+* `intermediate_channels`: Dimension of latent space (default: 40)
+* `full_joint_state`: Whether to use both positions and velocities (default: False)
+
+### MANN Configuration
+
+* `gating_hidden`: Hidden layer size for gating network
+* `main_hidden`: Hidden layer size for main network
+* `n_experts`: Number of expert networks in mixture
 
 ## Contributing
 
@@ -88,14 +169,13 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 
 ## License
 
-This project is licensed under the Apache 2.0 License - see [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache 2.0 License - see [LICENSE](https://claude.ai/chat/LICENSE) file for details.
 
 ## Citation
 
 If you use this implementation in your research, please cite the original DeepPhase paper:
 
-<pre>
-
+```bibtex
 @inproceedings{starke2022deepphase,
   title={DeepPhase: Periodic Autoencoders for Learning Motion Phase Manifolds},
   author={Starke, Sebastian and Mason, Ian and Komura, Taku},
@@ -103,4 +183,4 @@ If you use this implementation in your research, please cite the original DeepPh
   year={2022},
   organization={ACM}
 }
-</pre>
+```
