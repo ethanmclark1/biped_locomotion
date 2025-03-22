@@ -6,19 +6,19 @@ import numpy as np
 import torch.nn as nn
 import matplotlib.pyplot as plt
 
-import kinematic_predictor.scripts.utils.helper as helper
-import kinematic_predictor.scripts.utils.plotter as plotter
+import humanoid_loco.scripts.utils.helper as helper
+import humanoid_loco.scripts.utils.plotter as plotter
 
 from torch.utils.data import DataLoader
 
-from kinematic_predictor.scripts.pae.network import PAE
-from kinematic_predictor.scripts.pae.dataset import DatasetPAE
+from humanoid_loco.scripts.pae.network import PAE
+from humanoid_loco.scripts.pae.dataset import DatasetPAE
 
 
 class TrainerPAE:
     def __init__(self) -> None:
         self.config = None
-        config_path = "kinematic_predictor/scripts/config.yaml"
+        config_path = "humanoid_loco/scripts/config.yaml"
 
         self._init_params(config_path)
 
@@ -28,7 +28,6 @@ class TrainerPAE:
             self.frames,
             self.validation_ratio,
             self.datapath,
-            self.version_no,
             self.full_joint_state,
         )
 
@@ -72,7 +71,6 @@ class TrainerPAE:
         self.ckptpath = config["ckptpath"]
         imgpath = config["imgpath"]
         imgpath = os.path.join(imgpath, "pae")
-        self.version_no = config["version_no"]
 
         self.frames = int(self.window * fps) + 1
         self.ckpt_period = config["ckpt_period"]
@@ -89,7 +87,7 @@ class TrainerPAE:
 
         self.imgpath = os.path.join(
             imgpath,
-            f"{self.version_no}_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}",
+            f"{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}",
         )
 
         os.makedirs(self.ckptpath, exist_ok=True)
@@ -100,8 +98,8 @@ class TrainerPAE:
     def load(self) -> tuple:
         parameters = None
 
-        model_path = f"{self.ckptpath}/pae_{self.version_no}_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}.pt"
-        params_path = f"{self.ckptpath}/{self.version_no}_parameters_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}.txt"
+        model_path = f"{self.ckptpath}/pae_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}.pt"
+        params_path = f"{self.ckptpath}/parameters_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}.txt"
         if os.path.exists(model_path) and os.path.exists(params_path):
             checkpoint = torch.load(model_path)
             self.pae.load_state_dict(checkpoint)
@@ -229,7 +227,7 @@ class TrainerPAE:
 
         if epoch is None:
             print("Saving Parameters")
-            param_path = f"{self.ckptpath}/{self.version_no}_parameters_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}.txt"
+            param_path = f"{self.ckptpath}/parameters_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}.txt"
             with open(param_path, "w") as file:
                 for i, batch in enumerate(dataloader):
                     with torch.no_grad():
@@ -253,9 +251,9 @@ class TrainerPAE:
             parameters = np.loadtxt(param_path, dtype=np.float32)
 
         if epoch is not None:
-            ckpt_name = f"{self.ckptpath}/pae_{self.version_no}_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}_{epoch}.pt"
+            ckpt_name = f"{self.ckptpath}/pae_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}_{epoch}.pt"
         else:
-            ckpt_name = f"{self.ckptpath}/pae_{self.version_no}_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}.pt"
+            ckpt_name = f"{self.ckptpath}/pae_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}.pt"
         torch.save(self.pae.state_dict(), ckpt_name)
 
         return parameters

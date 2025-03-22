@@ -2,10 +2,10 @@ import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 
-import kinematic_predictor.scripts.utils.helper as helper
+import humanoid_loco.scripts.utils.helper as helper
 
 from torch.utils.data import DataLoader
-from kinematic_predictor.scripts.pae.dataset import DatasetPAE
+from humanoid_loco.scripts.pae.dataset import DatasetPAE
 
 
 def plot_joint_vel_history(
@@ -80,7 +80,7 @@ def plot_joint_state_history(
 
 
 if __name__ == "__main__":
-    config_path = "kinematic_predictor/scripts/config.yaml"
+    config_path = "humanoid_loco/scripts/config.yaml"
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
 
@@ -89,11 +89,10 @@ if __name__ == "__main__":
     frames = int(config["fps"] * config["window"]) + 1
     validation_ratio = config["validation_ratio"]
     datapath = config["datapath"]
-    version_no = config["version_no"]
     full_joint_state = config["PAE"]["full_joint_state"]
 
     dataset = DatasetPAE(
-        seed, n_joints, frames, validation_ratio, datapath, version_no, full_joint_state
+        seed, n_joints, frames, validation_ratio, datapath, full_joint_state
     )
     dataset.set_mode("eval")
     data_loader = DataLoader(dataset, batch_size=1, shuffle=False)

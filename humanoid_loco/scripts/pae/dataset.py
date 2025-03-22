@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-import kinematic_predictor.scripts.utils.helper as helper
+import humanoid_loco.scripts.utils.helper as helper
 
 from torch.utils.data import Dataset
 

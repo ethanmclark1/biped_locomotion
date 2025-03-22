@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-import kinematic_predictor.scripts.utils.helper as helper
+import humanoid_loco.scripts.utils.helper as helper
 
 from torch.utils.data import Dataset
 from scipy.spatial.transform import Rotation as R
@@ -44,7 +44,6 @@ class DatasetMANN(Dataset):
         validation_ratio: float,
         datapath: str,
         ckptpath: str,
-        version_no: str,
         full_joint_state: bool = False,
         mirroring: bool = False,
     ) -> None:
@@ -57,7 +56,7 @@ class DatasetMANN(Dataset):
         self.target_data = None
         self.device = helper.get_device()
 
-        data_paths = helper.get_data_paths(datapath, version_no)
+        data_paths = helper.get_data_paths(datapath)
         self._process_data(
             data_paths,
             n_joints,
@@ -66,7 +65,6 @@ class DatasetMANN(Dataset):
             total_frames,
             sampled_frames,
             ckptpath,
-            version_no,
             full_joint_state,
         )
 
@@ -94,34 +92,29 @@ class DatasetMANN(Dataset):
         # get the actual index from the current mode indices
         actual_idx = self.mode_indices[mode_idx]
 
-        # skip the first column (sequence number)
-        input_item = self.input_data[actual_idx][1:]
-        target_item = self.target_data[actual_idx][1:]
+        input_item = self.input_data[actual_idx]
+        target_item = self.target_data[actual_idx]
 
         return input_item, target_item
 
-    # remove the sequence number
     @property
     def input_shape(self) -> tuple:
-        return self.input_data.shape[1] - 1
+        return self.input_data.shape[1]
 
-    # remove the sequence number
     @property
     def target_shape(self) -> tuple:
-        return self.target_data.shape[1] - 1
+        return self.target_data.shape[1]
 
-    # remove the sequence number
     @property
     def x_norm(self) -> torch.Tensor:
-        mean = self.input_data[:, 1:].mean(axis=0)
-        std = self.input_data[:, 1:].std(axis=0)
+        mean = self.input_data[:, :].mean(axis=0)
+        std = self.input_data[:, :].std(axis=0)
         return torch.vstack((mean, std)).float()
 
-    # remove the sequence number
     @property
     def y_norm(self) -> tuple:
-        mean = self.target_data[:, 1:].mean(axis=0)
-        std = self.target_data[:, 1:].std(axis=0)
+        mean = self.target_data[:, :].mean(axis=0)
+        std = self.target_data[:, :].std(axis=0)
         return torch.vstack((mean, std)).float()
 
     def _process_character_data(
@@ -293,12 +286,11 @@ class DatasetMANN(Dataset):
         total_frames: int,
         sampled_frames: int,
         ckptpath: str,
-        version_no: str,
         full_joint_state: bool,
         mirroring: bool,
     ) -> None:
 
-        for sequence_num, data_path in enumerate(data_paths):
+        for data_path in data_paths:
             root_states = torch.from_numpy(
                 np.load(f"{data_path}_walking_root_states.npy")
             ).to(torch.float32)
@@ -310,7 +302,7 @@ class DatasetMANN(Dataset):
             ).to(torch.float32)
             parameters = torch.from_numpy(
                 np.loadtxt(
-                    f"{ckptpath}/{version_no}_parameters_{phase_channels}phases_{intermediate_channels}intermediate_{total_frames}frames_{full_joint_state}.txt",
+                    f"{ckptpath}/parameters_{phase_channels}phases_{intermediate_channels}intermediate_{total_frames}frames_{full_joint_state}.txt",
                     dtype=np.float32,
                 )
             )
@@ -335,12 +327,10 @@ class DatasetMANN(Dataset):
                 sampled_frames,
             )
 
-            sequence_data = torch.full((cmd_vels.shape[0], 1), sequence_num)
 
             self.input_data = (
                 torch.hstack(
                     (
-                        sequence_data,
                         cmd_vels,
                         character_data,
                         phase_space,
@@ -350,7 +340,7 @@ class DatasetMANN(Dataset):
                 .to(self.device)
             )
             self.target_data = (
-                torch.hstack((sequence_data, character_data, phase_update))[1:]
+                torch.hstack((character_data, phase_update))[1:]
                 .float()
                 .to(self.device)
             )

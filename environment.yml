@@ -1,4 +1,4 @@
-name: kinematic_predictor
+name: humanoid_loco
 channels:
   - anaconda
   - pytorch

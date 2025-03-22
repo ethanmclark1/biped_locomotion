@@ -4,19 +4,19 @@ import torch
 import wandb
 
 import torch.nn.functional as F
-import kinematic_predictor.scripts.utils.helper as helper
-import kinematic_predictor.scripts.utils.plotter as plotter
+import humanoid_loco.scripts.utils.helper as helper
+import humanoid_loco.scripts.utils.plotter as plotter
 
 from torch.utils.data import DataLoader
 
-from kinematic_predictor.scripts.mann.network import MANN
-from kinematic_predictor.scripts.mann.dataset import DatasetMANN, TARGET_STRUCTURE
+from humanoid_loco.scripts.mann.network import MANN
+from humanoid_loco.scripts.mann.dataset import DatasetMANN, TARGET_STRUCTURE
 
 
 class TrainerMANN:
     def __init__(self) -> None:
         self.config = None
-        config_path = "kinematic_predictor/scripts/config.yaml"
+        config_path = "humanoid_loco/scripts/config.yaml"
 
         self._init_params(config_path)
 
@@ -30,7 +30,6 @@ class TrainerMANN:
             self.validation_ratio,
             self.datapath,
             self.ckptpath,
-            self.version_no,
             self.full_joint_state,
         )
 
@@ -72,7 +71,6 @@ class TrainerMANN:
         self.ckptpath = config["ckptpath"]
         imgpath = config["imgpath"]
         imgpath = os.path.join(imgpath, "mann")
-        self.version_no = config["version_no"]
 
         self.ckpt_period = config["ckpt_period"]
         self.validation_ratio = config["validation_ratio"]
@@ -86,7 +84,7 @@ class TrainerMANN:
 
         self.imgpath = os.path.join(
             imgpath,
-            f"{self.version_no}_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.total_frames}frames_{self.full_joint_state}",
+            f"{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.total_frames}frames_{self.full_joint_state}",
         )
         os.makedirs(self.imgpath, exist_ok=True)
         os.makedirs(self.ckptpath, exist_ok=True)
@@ -96,7 +94,7 @@ class TrainerMANN:
     def load(self) -> bool:
         loaded_model = False
 
-        model_path = f"{self.ckptpath}/mann_{self.version_no}_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}.pt"
+        model_path = f"{self.ckptpath}/mann_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.frames}frames_{self.full_joint_state}.pt"
         if os.path.exists(model_path):
             checkpoint = torch.load(model_path)
             self.mann.load_state_dict(checkpoint)
@@ -297,9 +295,9 @@ class TrainerMANN:
 
     def save_model(self, epoch: int = None) -> None:
         if epoch is not None:
-            ckpt_name = f"{self.ckptpath}/mann_{self.version_no}_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.total_frames}frames_{self.full_joint_state}_epoch{epoch}.pt"
+            ckpt_name = f"{self.ckptpath}/mann_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.total_frames}frames_{self.full_joint_state}_epoch{epoch}.pt"
         else:
-            ckpt_name = f"{self.ckptpath}/mann_{self.version_no}_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.total_frames}frames_{self.full_joint_state}.pt"
+            ckpt_name = f"{self.ckptpath}/mann_{self.phase_channels}phases_{self.intermediate_channels}intermediate_{self.total_frames}frames_{self.full_joint_state}.pt"
 
         torch.save(self.mann.state_dict(), ckpt_name)
 

@@ -52,9 +52,9 @@ def to_numpy(x: torch.Tensor) -> np.ndarray:
     return x.data.cpu().numpy()
 
 
-def get_data_paths(data_path: str, version_no: str) -> list:
+def get_data_paths(data_path: str) -> list:
     sequence_dirs = glob.glob(os.path.join(data_path, "sequence*"))
-    data_paths = [os.path.join(seq_dir, version_no) for seq_dir in sequence_dirs]
+    data_paths = [os.path.join(seq_dir) for seq_dir in sequence_dirs]
 
     return data_paths
 

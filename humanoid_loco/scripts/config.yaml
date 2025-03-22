@@ -1,10 +1,9 @@
 seed: 42
 ckpt_period: 10
 
-version_no: Nadia_v17
-datapath: kinematic_predictor/data
-ckptpath: kinematic_predictor/ckpt
-imgpath: kinematic_predictor/img
+datapath: humanoid_loco/data
+ckptpath: humanoid_loco/ckpt
+imgpath: humanoid_loco/img
 
 fps: 60
 window: 2.0

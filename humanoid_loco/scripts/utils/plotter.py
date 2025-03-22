@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
 
-import kinematic_predictor.scripts.utils.helper as helper
+import humanoid_loco.scripts.utils.helper as helper
 
 from datetime import datetime
 
