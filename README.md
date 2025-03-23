@@ -1,10 +1,10 @@
-# Biped locomotionmotion: Deep Phase Motion Generation Framework
+# Biped Locomotion: Deep Phase Motion Generation Framework
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache2.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0) ![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg) ![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Overview
 
-Biped locomotionmotion is a robot-agnostic framework that adapts the [DeepPhase](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2022) motion generation system ([Starke et al., 2022](https://github.com/sebastianstarke/AI4Animation/blob/master/Media/SIGGRAPH_2022/Paper.pdf)) for practical robotics applications. This implementation transforms the original animation-focused approach into a flexible framework for generating fluid, natural motions for various robot platforms.
+Biped Locomotion is a robot-agnostic framework that adapts the [DeepPhase](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2022) motion generation system ([Starke et al., 2022](https://github.com/sebastianstarke/AI4Animation/blob/master/Media/SIGGRAPH_2022/Paper.pdf)) for practical robotics applications. This implementation transforms the original animation-focused approach into a flexible framework for generating fluid, natural motions for various robot platforms.
 
 Key contributions of this repo include:
 
