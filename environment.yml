@@ -1,4 +1,4 @@
-name: humanoid_loco
+name: biped_locomotion
 channels:
   - anaconda
   - pytorch

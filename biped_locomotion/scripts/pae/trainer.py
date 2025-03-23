@@ -6,19 +6,19 @@ import numpy as np
 import torch.nn as nn
 import matplotlib.pyplot as plt
 
-import humanoid_loco.scripts.utils.helper as helper
-import humanoid_loco.scripts.utils.plotter as plotter
+import biped_locomotion.scripts.utils.helper as helper
+import biped_locomotion.scripts.utils.plotter as plotter
 
 from torch.utils.data import DataLoader
 
-from humanoid_loco.scripts.pae.network import PAE
-from humanoid_loco.scripts.pae.dataset import DatasetPAE
+from biped_locomotion.scripts.pae.network import PAE
+from biped_locomotion.scripts.pae.dataset import DatasetPAE
 
 
 class TrainerPAE:
     def __init__(self) -> None:
         self.config = None
-        config_path = "humanoid_loco/scripts/config.yaml"
+        config_path = "biped_locomotion/scripts/config.yaml"
 
         self._init_params(config_path)
 

@@ -1,10 +1,10 @@
-# Humanoid Locomotion: Deep Phase Motion Generation Framework
+# Biped locomotionmotion: Deep Phase Motion Generation Framework
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache2.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0) ![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg) ![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Overview
 
-Humanoid Locomotion is a robot-agnostic framework that adapts the [DeepPhase](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2022) motion generation system ([Starke et al., 2022](https://github.com/sebastianstarke/AI4Animation/blob/master/Media/SIGGRAPH_2022/Paper.pdf)) for practical robotics applications. This implementation transforms the original animation-focused approach into a flexible framework for generating fluid, natural motions for various robot platforms.
+Biped locomotionmotion is a robot-agnostic framework that adapts the [DeepPhase](https://github.com/sebastianstarke/AI4Animation/tree/master/AI4Animation/SIGGRAPH_2022) motion generation system ([Starke et al., 2022](https://github.com/sebastianstarke/AI4Animation/blob/master/Media/SIGGRAPH_2022/Paper.pdf)) for practical robotics applications. This implementation transforms the original animation-focused approach into a flexible framework for generating fluid, natural motions for various robot platforms.
 
 Key contributions of this repo include:
 
@@ -48,8 +48,8 @@ apt-get install git-lfs  # Ubuntu/Debian
 brew install git-lfs  # macOS
 
 # Clone and initialize LFS
-git clone https://github.com/ethanmclark1/humanoid_loco.git
-cd humanoid_loco
+git clone https://github.com/ethanmclark1/biped_locomotion.git
+cd biped_locomotion
 git lfs install
 git lfs pull
 ```
@@ -59,7 +59,7 @@ git lfs pull
 ```bash
 # Create and activate conda environment
 conda env create -f environment.yml
-conda activate humanoid_loco
+conda activate biped_locomotion
 
 # Verify installation
 python -c "import torch; import numpy as np; import quaternion; import scipy"
@@ -70,7 +70,7 @@ python -c "import torch; import numpy as np; import quaternion; import scipy"
 The repository is organized as follows:
 
 ```
-humanoid_loco/
+biped_locomotion/
 ├── data/                # Motion capture data (LFS tracked)
 ├── scripts/             # Core implementation
 │   ├── mann/            # Mode-Adaptive Neural Network
@@ -87,7 +87,7 @@ humanoid_loco/
 
 ### Data Preparation
 
-Place your motion data in the `humanoid_loco/data/sequence_X/` directories with:
+Place your motion data in the `biped_locomotion/data/sequence_X/` directories with:
 
 * `walking_joint_states.npy`: Joint angles in degrees
 * `walking_root_states.npy`: Root position, orientation and velocities
@@ -99,7 +99,7 @@ Place your motion data in the `humanoid_loco/data/sequence_X/` directories with:
 
 ```bash
 # Run from project root
-python -m humanoid_loco.scripts.pae.trainer
+python -m biped_locomotion.scripts.pae.trainer
 ```
 
 This learns to encode joint motions into periodic phase parameters.
@@ -108,7 +108,7 @@ This learns to encode joint motions into periodic phase parameters.
 
 ```bash
 # Run from project root 
-python -m humanoid_loco.scripts.mann.trainer
+python -m biped_locomotion.scripts.mann.trainer
 ```
 
 This learns to predict motion based on command inputs and phase representation.
@@ -118,12 +118,12 @@ This learns to predict motion based on command inputs and phase representation.
 To run inference and generate motion:
 
 ```bash
-python -m humanoid_loco.scripts.mann.inference
+python -m biped_locomotion.scripts.mann.inference
 ```
 
 ### Configuration
 
-Modify `humanoid_loco/scripts/config.yaml` to adjust:
+Modify `biped_locomotion/scripts/config.yaml` to adjust:
 
 * Network architecture parameters
 * Training hyperparameters
@@ -133,12 +133,12 @@ Modify `humanoid_loco/scripts/config.yaml` to adjust:
 
 ### Import Errors
 
-If you encounter `ModuleNotFoundError: No module named 'humanoid_loco'`, ensure you're running scripts from the project root:
+If you encounter `ModuleNotFoundError: No module named 'biped_locomotion'`, ensure you're running scripts from the project root:
 
 ```bash
 # Correct way to run scripts
-cd /path/to/humanoid_loco
-python -m humanoid_loco.scripts.pae.trainer
+cd /path/to/biped_locomotion
+python -m biped_locomotion.scripts.pae.trainer
 ```
 
 ### CUDA Issues

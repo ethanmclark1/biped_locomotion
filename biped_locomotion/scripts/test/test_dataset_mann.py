@@ -2,10 +2,10 @@ import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 
-import humanoid_loco.scripts.utils.helper as helper
+import biped_locomotion.scripts.utils.helper as helper
 
 from torch.utils.data import DataLoader
-from humanoid_loco.scripts.mann.dataset import (
+from biped_locomotion.scripts.mann.dataset import (
     DatasetMANN,
     INPUT_STRUCTURE,
     TARGET_STRUCTURE,
@@ -297,7 +297,7 @@ def plot_phases(dataloader: DataLoader, sampled_frames: int, window_size: int) -
 
 
 if __name__ == "__main__":
-    config_path = "humanoid_loco/scripts/config.yaml"
+    config_path = "biped_locomotion/scripts/config.yaml"
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
 

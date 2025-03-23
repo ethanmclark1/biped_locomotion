@@ -1,9 +1,9 @@
 seed: 42
 ckpt_period: 10
 
-datapath: humanoid_loco/data
-ckptpath: humanoid_loco/ckpt
-imgpath: humanoid_loco/img
+datapath: biped_locomotion/data
+ckptpath: biped_locomotion/ckpt
+imgpath: biped_locomotion/img
 
 fps: 60
 window: 2.0

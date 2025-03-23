@@ -2,10 +2,10 @@ import yaml
 import numpy as np
 import matplotlib.pyplot as plt
 
-import humanoid_loco.scripts.utils.helper as helper
+import biped_locomotion.scripts.utils.helper as helper
 
 from torch.utils.data import DataLoader
-from humanoid_loco.scripts.pae.dataset import DatasetPAE
+from biped_locomotion.scripts.pae.dataset import DatasetPAE
 
 
 def plot_joint_vel_history(
@@ -80,7 +80,7 @@ def plot_joint_state_history(
 
 
 if __name__ == "__main__":
-    config_path = "humanoid_loco/scripts/config.yaml"
+    config_path = "biped_locomotion/scripts/config.yaml"
     with open(config_path, "r") as file:
         config = yaml.safe_load(file)
 

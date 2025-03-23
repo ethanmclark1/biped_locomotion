@@ -3,8 +3,8 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 
-from humanoid_loco.scripts.utils.adam_wr.adam_w import AdamW
-from humanoid_loco.scripts.utils.adam_wr.cyclic_scheduler import (
+from biped_locomotion.scripts.utils.adam_wr.adam_w import AdamW
+from biped_locomotion.scripts.utils.adam_wr.cyclic_scheduler import (
     CyclicLRWithRestarts,
 )
 

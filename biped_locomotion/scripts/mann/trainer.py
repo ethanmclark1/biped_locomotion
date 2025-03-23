@@ -4,19 +4,19 @@ import torch
 import wandb
 
 import torch.nn.functional as F
-import humanoid_loco.scripts.utils.helper as helper
-import humanoid_loco.scripts.utils.plotter as plotter
+import biped_locomotion.scripts.utils.helper as helper
+import biped_locomotion.scripts.utils.plotter as plotter
 
 from torch.utils.data import DataLoader
 
-from humanoid_loco.scripts.mann.network import MANN
-from humanoid_loco.scripts.mann.dataset import DatasetMANN, TARGET_STRUCTURE
+from biped_locomotion.scripts.mann.network import MANN
+from biped_locomotion.scripts.mann.dataset import DatasetMANN, TARGET_STRUCTURE
 
 
 class TrainerMANN:
     def __init__(self) -> None:
         self.config = None
-        config_path = "humanoid_loco/scripts/config.yaml"
+        config_path = "biped_locomotion/scripts/config.yaml"
 
         self._init_params(config_path)
 

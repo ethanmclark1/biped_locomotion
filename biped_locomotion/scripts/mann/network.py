@@ -3,14 +3,14 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 
-import humanoid_loco.scripts.utils.helper as helper
+import biped_locomotion.scripts.utils.helper as helper
 
-from humanoid_loco.scripts.utils.adam_wr.adam_w import AdamW
-from humanoid_loco.scripts.utils.adam_wr.cyclic_scheduler import (
+from biped_locomotion.scripts.utils.adam_wr.adam_w import AdamW
+from biped_locomotion.scripts.utils.adam_wr.cyclic_scheduler import (
     CyclicLRWithRestarts,
 )
 
-from humanoid_loco.scripts.mann.dataset import INPUT_STRUCTURE, TARGET_STRUCTURE
+from biped_locomotion.scripts.mann.dataset import INPUT_STRUCTURE, TARGET_STRUCTURE
 
 
 # Output-Blended MoE Layer
